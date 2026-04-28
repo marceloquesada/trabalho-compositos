@@ -3,16 +3,6 @@ clc
 
 % 1 - Receber as propriedades da lâmina nas direções 1 e 2 (módulos de elasticidade - E1, E2, coeficiente de Poisson - v12, módulo de cisalhamento - G12, resistências da lâmina -Xt,Xc,Yt,Yc,S6 ou Xet,Xec,Yet,Yec,Se);
 
-% E1 = input('Digite o módulo de elasticidade na direção 1 (E1): ');
-% E2 = input('Digite o módulo de elasticidade na direção 2 (E2): ');
-% v12 = input('Digite o coeficiente de Poisson (v12): ');
-% G12 = input('Digite o módulo de cisalhamento (G12): ');
-% Xt = input('Digite a resistência à tração na direção 1 (Xt): ');
-% Xc = input('Digite a resistência à compressão na direção 1 (Xc): ');
-% Yt = input('Digite a resistência à tração na direção 2 (Yt): ');
-% Yc = input('Digite a resistência à compressão na direção 2 (Yc): ');
-% S6 = input('Digite a resistência ao cisalhamento (S6): ');
-
 E1 = 53780
 E2 = 17930
 v12 = 0.2500

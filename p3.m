@@ -3,56 +3,22 @@ clc
 
 % 1 – Definir o número de n camadas do laminado, onde n deve definido pelo programador;
 
-% n = input('Insira o número de camadas (inteiro): '); % Número de camadas que o usuário deve definir
+% Insira o número de camadas (inteiro)
 n = 3
 
 % 2 – Todas as camadas devem ter a mesma espessura t que será definida pelo programador;
 
-% t = input('Insira a espessura das camadas: '); % Tamanho de espessura t que todas as camadas devem ter
+% Insira a espessura das camadas
 t = 5.0000e-04
 
-% 3 – Deve ser criado um vetor com as orientações de cada camada seguindo o padrão:
-% orientation(1) = ##;
-% orientation(2) = ##;
-% ...
-% orientation(n) = ##;
-% onde os valores das orientações devem ser fornecidos em graus pelo programador
-
 orientation = zeros(1, n);
+orientation = [0, 30, -45] % Exemplo de orientações para 3 camadas
 
-% Preenche as orientações de cada camada
-% for i = 1:n
-%     mensagem = sprintf('Insira a orientação (em graus) da camada %d: ', i); % Graus
-%     orientation(i) = input(mensagem);
-% end
-
-orientation = [0, 30, -45]; % Exemplo de orientações para 3 camadas
-
-% 4 – Receber as propriedades da lâmina nas direções 1 e 2 (módulos de elasticidade - E1, E2, coeficientes de Poisson - v12, v13, v23, módulos de cisalhamento - G12, G13, G23, coeficientes de expansão térmica alpha1 e alpha2, resistências da lâmina - Xt,Xc,Yt,Yc,S6 ou Xet,Xec,Yet,Yec,Se);
-
-% E1 = input('Insira o  modelo de elasticidade E1 '); %Pa
-% E2 = input('Insira o  modelo de elasticidade E2 '); %Pa
-
-% v12 = input('Insira o  coeficiente de Poisson v12 '); %Pa
-% v13 = input('Insira o  coeficiente de Poisson v13 '); %Pa
-% v23 = input('Insira o  coeficiente de Poisson v23 '); %Pa
-
-% G12 = input('Insira o coeficiente de cisalhamento G12 '); %Pa
-% G13 = input('Insira o coeficiente de cisalhamento G13 '); %Pa
-% G23 = input('Insira o coeficiente de cisalhamento G23 '); %Pa
-
-% alpha1 = input('Insira o coeficiente de expansão térmica 1 '); %Pa
-% alpha2 = input('Insira o coeficiente de expansão térmica 2 '); %Pa
-
-% Xet = input('Insira a resistência da lâmina Xet '); %Pa
-% Xec = input('Insira a resistência da lâmina Xec '); %Pa
-% Yet = input('Insira a resistência da lâmina Yet '); %Pa
-% Yec = input('Insira a resistência da lâmina Yec '); %Pa
-% Se = input('Insira a resistência da lâmina Se '); %Pa
+% 4 – Receber as propriedades da lâmina nas direções 1 e 2 (módulos de elasticidade - E1, E2, coeficientes de Poisson - v12, v13, v23, módulos de cisalhamento - G12, G13, G23, coeficientes de expansão térmica alpha1 e alpha2, resistências da lâmina - Xt,Xc,Yt,Yc,S6 ou Xt,Xc,Yt,Yc,S);
 
 E1 = 1.8100e+11
 E2 = 1.0300e+10
-% E3 = 1.0300e+10
+E3 = 1.0300e+10
 v12 = 0.2800
 v13 = 0.2800
 v23 = 0.2800
@@ -61,11 +27,12 @@ G13 = 7.1700e+09
 G23 = 7.1700e+09
 alpha1 = 0
 alpha2 = 0
-Xet = 1.0350e+09
-Xec = 1.0350e+09
-Yet = 2.7600e+07
-Yec = 1.3800e+08
-Se = 4.1400e+07
+Xt = 1.0350e+09
+Xc = 1.0350e+09
+Yt = 2.7600e+07
+Yc = 1.3800e+08
+S = 4.1400e+07
+
 
 % 5 – Para cada camada do laminado calcular as matrizes [𝑄] e o vetor {𝛼}𝑥𝑦.
 % Para a matriz [𝑄] usar uma matriz Q=zeros(3,3,n) e para o vetor {𝛼}𝑥𝑦 usar uma matriz alphaXY=zeros(3,1,n), onde:
@@ -89,13 +56,13 @@ for i = 1:n
     theta = orientation(i);
 
     c = cosd(theta); % Cosseno da orientação
-    s = sind(theta); % Seno da orientação
+    s = sind(theta); % Sno da orientação
 
     L(:, :, i) = [c^2, s^2, c * s;
             s^2, c^2, -c * s;
             -2 * c * s, 2 * c * s, c^2 - s^2];
 
-    Q(:, :, i) = L(:, :, i)' * Q0 * L(:, :, i)
+    Q(:, :, i) = L(:, :, i)' * Q0 * L(:, :, i);
 
     % Cálculo do vetor alphaXY
     alphaXY(1, 1, i) = alpha1 * c^2 + alpha2 * s^2; % Elemento X de alpha
@@ -103,15 +70,8 @@ for i = 1:n
     alphaXY(3, 1, i) = (alpha1 - alpha2) * c * s; % Elemento XY de alpha
 end
 
+
 % 6 – Receber o estado os carregamentos mecânicos Nmec = (Nx, Ny e Nxy), Mmec = (Mx, My e Mxy) e a variação de temperatura DT em graus Celsius;
-
-% Nx = input('Insira o carregamento mecânico em x:'); %Pa
-% Ny = input('Insira o carregamento mecânico em y:'); %Pa
-% Nxy = input('Insira o carregamento mecânico em xy:'); %Pa
-
-% Mx = input('Insira o carregamento mecânico em x:'); %Pa
-% My = input('Insira o carregamento mecânico em y:'); %Pa
-% Mxy = input('Insira o carregamento mecânico em xy:'); %Pa
 
 % % Vetores de carregamento
 % Nmec = [Nx; Ny; Nxy]; % Forças normais e de cisalhamento
@@ -121,7 +81,7 @@ Nmec = [150000; 0; 0]
 
 Mmec = [0; 0; 0]
 
-% DT = input('Insira a variação de temperatura DT (em graus)'); %graus Celsius
+% Insira a variação de temperatura DT (em graus)
 DT = 0;
 
 % 7 – Calcular as matrizes [A], [B], [D] e [As];
@@ -153,7 +113,7 @@ for i = 1:n
     % Matriz As (cisalhamento transversal)
     theta = orientation(i);
     c = cosd(theta); % Cosseno da orientação
-    s = sind(theta); % Seno da orientação
+    s = sind(theta); % Sno da orientação
 
     % Matriz de rigidez de cisalhamento local
     Qs = [G13, 0; 0, G23];
@@ -188,13 +148,12 @@ fprintf('  %e\n', kapa);
 
 % 9 – Criar a variável npl que define a quantidade de pontos dentro de uma camada onde as deformações, tensões e critérios de falhas serão analisados. O código deve funcionar para qualquer valor de npl. No mínimo usar npl igual a 3.
 
-% Solicita ao usuário o número de pontos por camada (npl >= 3)
-% npl = input('Informe a quantidade de pontos por camada para análise (npl >= 3): ');
+% Informe a quantidade de pontos por camada para análise (npl >= 3);
 npl = 3;
 
-while npl < 3
-    fprintf('O valor de npl deve ser maior ou igual a 3.');
-    npl = input('Informe a quantidade de pontos por camada para análise (npl >= 3): ');
+if npl < 3
+    fprintf('Erro: O valor de npl deve ser maior ou igual a 3.\n');
+    exit(1)
 end
 
 % 10 – Calcular o valor da coordenada z para cada ponto analisado ao longo do laminado e armazenar esses valores na variável zpos;
@@ -224,7 +183,7 @@ zpos
 
 StrainXY = zeros(3, 1, totalPoints);
 
-fprintf(' Results for Strains in XY directions')
+fprintf('Results for Strains in XY directions\n')
 
 for i = 1:n
 
@@ -247,7 +206,7 @@ end
 
 StressXY = zeros(3, 1, totalPoints);
 
-fprintf(' Results for Stresses in XY directions')
+fprintf(' Results for Stresses in XY directions\n')
 
 for i = 1:n
 
@@ -269,7 +228,7 @@ end
 
 Stress12 = zeros(3, 1, totalPoints);
 
-fprintf(' Results for Stresses in 12 directions')
+fprintf(' Results for Stresses in 12 directions\n')
 
 for i = 1:n
 
@@ -295,7 +254,7 @@ T12 = Stress12(3, 1, :)
 
 Strain12 = zeros(3, 1, totalPoints);
 
-fprintf(' Results for Strains in 12 directions')
+fprintf(' Results for Strains in 12 directions\n')
 
 for i = 1:n
 
@@ -317,7 +276,7 @@ Y12 = Strain12(3, 1, :)
 
 % 15 – Avaliar para cada posição z o critério de máxima tensão e caso haja falha, indique o modo de falha como foi solicitado na P2;
 
-MT = [Xet, Yet, Xec, Yec, Se];
+MT = [Xt, Yt, Xc, Yc, S];
 
 for i = 1:totalPoints
 
@@ -350,7 +309,7 @@ end
 
 % 16 – Avaliar para cada posição z o critério de máxima deformação e caso haja falha, indique o modo de falha como foi solicitado na P2;
 
-MD = [Xet / E1, Yet / E2, Xec / E1, Yec / E2, Se / G12];
+MD = [Xt / E1, Yt / E2, Xc / E1, Yc / E2, S / G12];
 
 for i = 1:totalPoints
 
@@ -386,18 +345,18 @@ end
 for i = 1:totalPoints
 
     if S1(i) > 0
-        X = Xet;
+        X = Xt;
     else
-        X = Xec;
+        X = Xc;
     end
 
     if S2(i) > 0
-        Y = Yet;
+        Y = Yt;
     else
-        Y = Yec;
+        Y = Yc;
     end
 
-    tsai_hill = (S1(i) / X)^2 - (S1(i) * S2(i)) / (X^2) + (S2(i) / Y)^2 + (T12(i) / Se)^2;
+    tsai_hill = (S1(i) / X)^2 - (S1(i) * S2(i)) / (X^2) + (S2(i) / Y)^2 + (T12(i) / S)^2;
 
     fprintf(['crit = %g\n'], tsai_hill)
     fprintf(['posicao = %g\n'], zpos(i))
@@ -416,18 +375,18 @@ end
 for i = 1:totalPoints
 
     if S1(i) > 0
-        X = Xet;
+        X = Xt;
     else
-        X = Xec;
+        X = Xc;
     end
 
     if S2(i) > 0
-        Y = Yet;
+        Y = Yt;
     else
-        Y = Yec;
+        Y = Yc;
     end
 
-    hoffmann = (S1(i)^2) / (Xec * Xet) - (S1(i) * S2(i)) / (Xec * Xet) + (S2(i)^2) / (Yec * Yet) - ((Xet - Xec) / (Xec * Xet)) * S1(i) - ((Yet - Yec) / (Yec * Yet)) * S2(i) + (T12(i)^2) / (Se^2);
+    hoffmann = (S1(i)^2) / (Xc * Xt) - (S1(i) * S2(i)) / (Xc * Xt) + (S2(i)^2) / (Yc * Yt) - ((Xt - Xc) / (Xc * Xt)) * S1(i) - ((Yt - Yc) / (Yc * Yt)) * S2(i) + (T12(i)^2) / (S^2);
 
     fprintf(['crit = %g\n'], hoffmann)
     fprintf(['posicao = %g\n'], zpos(i))
@@ -444,11 +403,11 @@ end
 
 for i = 1:totalPoints
 
-    F1 = 1 / Xet - 1 / Xec;
-    F2 = 1 / Yet - 1 / Yec;
-    F11 = 1 / (Xet * Xec);
-    F22 = 1 / (Yet * Yec);
-    F66 = 1 / (Se^2);
+    F1 = 1 / Xt - 1 / Xc;
+    F2 = 1 / Yt - 1 / Yc;
+    F11 = 1 / (Xt * Xc);
+    F22 = 1 / (Yt * Yc);
+    F66 = 1 / (S^2);
     F12 = -sqrt(F11 * F22) / 2;
 
     tsai_wu = F1 * S1(i) + F2 * S2(i) + F11 * S1(i)^2 + F22 * S2(i)^2 + F66 * T12(i)^2 + 2 * F12 * S1(i) * S2(i);
@@ -465,11 +424,11 @@ for i = 1:totalPoints
 end
 
 for i = 1:totalPoints
-    F1 = 1 / Xet - 1 / Xec;
-    F2 = 1 / Yet - 1 / Yec;
-    F11 = 1 / (Xet * Xec);
-    F22 = 1 / (Yet * Yec);
-    F66 = 1 / (Se^2);
+    F1 = 1 / Xt - 1 / Xc;
+    F2 = 1 / Yt - 1 / Yc;
+    F11 = 1 / (Xt * Xc);
+    F22 = 1 / (Yt * Yc);
+    F66 = 1 / (S^2);
     F12 = 0;
 
     tsai_wu_2 = F1 * S1(i) + F2 * S2(i) + F11 * S1(i)^2 + F22 * S2(i)^2 + F66 * T12(i)^2 + 2 * F12 * S1(i) * S2(i);
