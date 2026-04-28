@@ -65,6 +65,7 @@ Q = [E1 / (1 - v12 * v21), v12 * E2 / (1 - v12 * v21), 0;
     0, 0, G12]
 
 QXY = L' * Q * L
+SXY = inv(QXY)
 
 EXY = QXY * [e1; e2; Y12]
 
